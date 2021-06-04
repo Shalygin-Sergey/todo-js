@@ -35,11 +35,11 @@ function displayMessages() {
     let displayMessages = '';
 
     todoList.forEach((item, idx) => {
-        // Создаем в верстку уникальный индекс
+        // Создаем в верстку уникальный индекс + добавляем класс important
         displayMessages += `
         <li>
             <input type='checkbox' id='item_${idx}' ${item.checked ? 'checked' : ''}>
-            <label for='item_${idx}'>${item.todo}</label>
+            <label for='item_${idx}' class="${item.important ? 'important' : ''}">${item.todo}</label>
         </li>
         `;
         todo.innerHTML = displayMessages;
@@ -48,8 +48,34 @@ function displayMessages() {
 }
 
 todo.addEventListener('change', function(event){
+    // let idInput = event.target.getAttribute('id');
+    // let forLabel = todo.querySelector('[for='+ idInput +']');
+    // let valueLabel = forLabel.innerHTML;
+    // console.log('valueLabel: ', valueLabel);
+
     let idInput = event.target.getAttribute('id');
     let forLabel = todo.querySelector('[for='+ idInput +']');
     let valueLabel = forLabel.innerHTML;
     console.log('valueLabel: ', valueLabel);
-})
+
+    todoList.forEach((item) => {
+        // Если item.todo равен valueLabel то инвертируем item.cheked
+        if (item.todo === valueLabel) {
+            item.checked = !item.checked;
+            // записываем эти данные с помощью setItem в локал
+            localStorage.setItem('todo', JSON.stringify(todoList));
+        }
+    });
+});
+
+todo.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    todoList.forEach(function(item){
+        // кликаем по лейблу, поэтому берем таргет иннерхтмл и проверяем
+        if (item.todo === e.target.innerHTML){
+            item.important = !item.important;
+            displayMessages();
+            localStorage.setItem('todo', JSON.stringify(todoList));
+        }
+    });
+});
