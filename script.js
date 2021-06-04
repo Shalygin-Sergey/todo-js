@@ -14,6 +14,8 @@ if(localStorage.getItem('todo')) {
 
 // Создаем слушатель событий на нажатие кнопки
 addButton.addEventListener('click', () => {
+    // проверяем на пустоту строку ввода
+    if (!addMessage.value) return;
 
     let newTodo = {
         todo: addMessage.value,
@@ -25,6 +27,7 @@ addButton.addEventListener('click', () => {
     displayMessages();
     // Локал сторадж принимает только строку, setItem - создает новое значение
     localStorage.setItem('todo', JSON.stringify(todoList));
+    addMessage.value = '';
 });
 
 /* forEach — принимает колбэк функцию в которой
@@ -33,7 +36,10 @@ addButton.addEventListener('click', () => {
 */ 
 function displayMessages() {
     let displayMessages = '';
-
+    // очищаем поле если дел не стало
+    if (todoList.length === 0) {
+        todo.innerHTML = '';
+    }
     todoList.forEach((item, idx) => {
         // Создаем в верстку уникальный индекс + добавляем класс important
         displayMessages += `
@@ -70,10 +76,15 @@ todo.addEventListener('change', function(event){
 
 todo.addEventListener('contextmenu', function(e) {
     e.preventDefault();
-    todoList.forEach(function(item){
+    todoList.forEach(function(item, idx){
         // кликаем по лейблу, поэтому берем таргет иннерхтмл и проверяем
         if (item.todo === e.target.innerHTML){
+            // делаем проверку если зажат контрол то правой кнопкой удаляем дело
+            if (e.ctrlKey || e.metaKey) {
+                todoList.splice(idx, 1);
+            } else {
             item.important = !item.important;
+            }
             displayMessages();
             localStorage.setItem('todo', JSON.stringify(todoList));
         }
